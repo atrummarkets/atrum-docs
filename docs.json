@@ -12,7 +12,10 @@
     "groups": [
       {
         "group": "Getting started",
-        "pages": ["index", "quickstart"]
+        "pages": [
+          "index",
+          "quickstart"
+        ]
       },
       {
         "group": "Concepts",
@@ -25,11 +28,18 @@
       },
       {
         "group": "Guides",
-        "pages": ["guides/place-a-bet", "guides/run-a-node"]
+        "pages": [
+          "guides/place-a-bet",
+          "guides/run-a-node"
+        ]
       },
       {
         "group": "Reference",
-        "pages": ["reference/contracts", "reference/deployments", "reference/limits"]
+        "pages": [
+          "reference/contracts",
+          "reference/deployments",
+          "reference/limits"
+        ]
       }
     ]
   },
@@ -37,5 +47,9 @@
     "socials": {
       "github": "https://github.com/atrummarkets"
     }
+  },
+  "logo": {
+    "light": "/images/logo-light.svg",
+    "dark": "/images/logo-dark.svg"
   }
 }
