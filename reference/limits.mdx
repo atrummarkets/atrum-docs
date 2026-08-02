@@ -1,0 +1,71 @@
+---
+title: "Limits"
+description: "What Atrum does not do yet, and what it costs to use."
+---
+
+## Not ready for real money
+
+<Warning>
+**The trusted setup has a single contribution.** Whoever holds that randomness can forge
+proofs and mint collateral from nothing. A multi-party ceremony is required before mainnet,
+and it must happen **before** the final deployment — new proving keys mean new verifiers,
+which means redeploying every contract.
+</Warning>
+
+<Warning>
+**Decryption uses a single committee key**, held by the operator. That operator can decrypt
+every individual bet. The fix is a threshold committee — the proof machinery for it is already
+built and in use for settlement.
+</Warning>
+
+**No audit** has been performed.
+
+## Gas
+
+Monad charges the **declared** gas limit, and that limit is public. So every user action
+declares one identical envelope, or the limit itself would reveal which private action you
+took.
+
+Measured on real testnet transactions:
+
+| action | gas | % of the 2,500,000 envelope |
+|---|---|---|
+| `betEncrypted` | ~1,947,000 | 78% |
+| `deposit` | 1,815,993 | 73% |
+| `withdraw` | 1,804,341 | 72% |
+| `redeemPrivate` | 1,671,108 | 67% |
+
+<Note>
+Local `forge` figures understate the real cost by **32–55%** — it charges neither calldata,
+the intrinsic transaction cost, nor true cross-contract cold access. Treat every local number
+as a lower bound.
+</Note>
+
+The envelope is set once and should not move. Changing it is publicly observable and shrinks
+the anonymity set of everything submitted before the change.
+
+## Client-side cost
+
+Proofs are generated in the browser, and the artifacts must be downloaded first.
+
+| circuit | constraints | prove (Node) | download |
+|---|---|---|---|
+| `deposit` | 1,621 | 322ms | 2.4 MB |
+| `bet_encrypted` | 21,252 | 2,255ms | 11.8 MB |
+| `redeem_private` | 14,405 | 1,437ms | 7.8 MB |
+| `withdraw` | 14,438 | 1,411ms | 7.8 MB |
+
+Node timings are a **lower bound** for a browser. Cache artifacts, load them per action, and
+prove in a Web Worker.
+
+## Mechanism limits
+
+**Parimutuel dilution.** Money arriving after you changes your payout, and you cannot react.
+That is a property of the mechanism, not a bug, and better cryptography does not fix it.
+
+**No cancellation.** Deliberately. Free cancellation is an adverse-selection problem, not a
+pricing one: a fee cannot price an unbounded informed edge, and a deadline only shrinks the
+window.
+
+**One sequencer.** If it stops, the market halts. Funds are never at risk — but the failure
+mode is real and decentralising it is unbuilt work.

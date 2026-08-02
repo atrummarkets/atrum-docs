@@ -1,0 +1,59 @@
+---
+title: "Place a bet"
+description: "What a client does, end to end, to bet privately."
+---
+
+Every proof is generated **in the client**. No server ever sees your secrets.
+
+<Steps>
+  <Step title="Deposit">
+    Call `deposit` with a commitment and an amount **on the denomination ladder** (powers of
+    ten). Anything else reverts — an unusual amount would identify you, and would shrink the
+    anonymity set for everyone else.
+
+    Keep the note's nullifier and secret locally. They are the only way to spend it.
+  </Step>
+
+  <Step title="Wait for the graft">
+    Your commitment sits in a queue until the sequencer inserts it. You cannot bet from a note
+    that is not yet in the tree, because there is no Merkle path to prove membership with.
+  </Step>
+
+  <Step title="Fetch a Merkle path">
+    ```
+    GET /path?commitment=0x...
+    ```
+    The sequencer returns the path elements and indices. It cannot produce a proof for you and
+    never sees your secrets.
+  </Step>
+
+  <Step title="Build the proof">
+    Feed the note, the path, and the encrypted stake into the `bet_encrypted` circuit. See
+    `circuits/build/witness-inputs.json` in the repo for a recorded example of exactly what to
+    construct.
+
+    <Warning>
+    Proving is not instant. Measured in Node: around 2.3 seconds, with roughly 11.8 MB of
+    circuit artifacts to fetch first. Cache them, and prove in a Web Worker or the UI will
+    freeze.
+    </Warning>
+  </Step>
+
+  <Step title="Submit">
+    Call `betEncrypted` with the proof, the public signals, and the ciphertext — declaring the
+    **uniform gas limit**, never an estimate. An estimate leaks which action you took.
+  </Step>
+</Steps>
+
+## After the market resolves
+
+<Steps>
+  <Step title="Redeem privately">
+    Prove your position won and receive a **settled note**. No collateral moves and no amount
+    is published — this is the step that breaks the link between position and payout.
+  </Step>
+  <Step title="Withdraw">
+    Spend the settled note for public collateral, in a ladder amount, keeping the remainder as
+    a private change note. Withdraw whenever you like; timing is part of your privacy.
+  </Step>
+</Steps>

@@ -1,0 +1,56 @@
+---
+title: "Contracts"
+description: "The on-chain surface."
+---
+
+## ShieldedPool
+
+Every user action. Holds the commitment tree, nullifier set, and verifiers.
+
+| function | what it does |
+|---|---|
+| `deposit` | Locks collateral, queues a note. Amount **public**, must be on the denomination ladder. |
+| `betEncrypted` | Spends a note, publishes a ciphertext. Amount **private**; side public. |
+| `redeemPrivate` | Turns a winning position into a settled note. **Moves no collateral.** |
+| `withdraw` | Spends a settled note for public collateral, keeping change private. |
+| `flushBatch` | Sequencer-only. Grafts 64 leaves, padding with on-chain-derived fillers. |
+
+<Note>
+There is no public `redeem`. It existed once and published a recipient and an amount, which
+would retroactively reveal every position. It was removed, and the deployment invariants
+assert its selector is absent from deployed bytecode.
+</Note>
+
+## Vault
+
+Custodies collateral and holds the outcome. `Unresolved`, `Yes`, `No`, or `Void`.
+
+`split` mints paired YES/NO positions against collateral; `merge` reverses it; `redeem` pays
+the winning side. `voidMarket` is permissionless after a deadline and refunds everyone 1:1.
+
+`bettingCloseTime` and `resolutionStartTime` are **immutable**. No one can move a deadline
+after seeing how a market is going.
+
+## ElGamalAccumulator
+
+Holds the running encrypted total per market and side. Stores ciphertext only and cannot
+decrypt. Also maintains `betCount`, which the publisher reads to pace itself.
+
+## EncryptedParimutuelPool
+
+`publishFinalTotals` accepts decrypted totals with a Chaum-Pedersen proof that the decryption
+is honest with respect to the published committee key. **This is the only source a payout ever
+reads.**
+
+`publishAttestedRatio` records mid-market odds and is **unverified by construction** — no
+payout reads it.
+
+## PythResolver
+
+Implements `IOracleResolver`. Resolves a market from a signed price at a committed timestamp.
+Anyone may call; the caller decides nothing. See [Resolution](/concepts/resolution).
+
+## Denominations
+
+A pure library. Allows powers of ten up to 10^9, computed rather than stored. Enforced at the
+two points where a size becomes public: `deposit`, and the public leg of `withdraw`.

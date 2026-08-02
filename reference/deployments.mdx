@@ -1,0 +1,43 @@
+---
+title: "Deployments"
+description: "Live contract addresses."
+---
+
+## Monad testnet — chain 10143
+
+| contract | address |
+|---|---|
+| ShieldedPool | `0x6af21cA16B40ae5Ab154eE1867f30FC3E64BfBED` |
+| ElGamalAccumulator | `0xD80eD1de416aA9C1d4dc6DB28Fd06f9d9c39Ef2a` |
+| EncryptedParimutuelPool | `0x3f6768e883E8FB8465700c69EC99d351f7ADbF34` |
+| PythResolver | `0x9f12dF52CeA11F168E523E3f050bE310051683Fd` |
+| Vault (oracle market 10) | `0xf6057FBbCE7287Fc808a2692EB1F8db81cc8Ce53` |
+
+Verify any deployment yourself:
+
+```bash
+make verify-deployment POOL=0x6af21cA16B40ae5Ab154eE1867f30FC3E64BfBED
+```
+
+## Superseded
+
+Earlier deployments are recorded in the repo under `deployments/monad-testnet-10143/`,
+including two that were broken. They are kept deliberately: one could accept deposits and
+never pay anything out, and anyone who finds that address should know not to use it.
+
+<Warning>
+`0x8Ea29D5C3eed4Bc6D8E68c25065f6E30BDE74464` is a **one-way vault**. Its exit path was never
+bound, so collateral can go in and nothing can come out. Do not use it.
+</Warning>
+
+## Dependencies
+
+| | address |
+|---|---|
+| Pyth (Monad testnet) | `0x2880aB155794e7179c9eE2e38200202908C17B43` |
+
+<Note>
+The beta Pyth feed contract listed in Monad's own docs has **no code deployed** at the address
+given — checked with `cast code`, which returns `0x`. There is currently no MON/USD feed to
+resolve against.
+</Note>

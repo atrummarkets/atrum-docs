@@ -1,0 +1,41 @@
+{
+  "$schema": "https://mintlify.com/docs.json",
+  "name": "Atrum",
+  "theme": "mint",
+  "colors": {
+    "primary": "#5B21B6",
+    "light": "#A78BFA",
+    "dark": "#3B0764"
+  },
+  "favicon": "/images/favicon.png",
+  "navigation": {
+    "groups": [
+      {
+        "group": "Getting started",
+        "pages": ["index", "quickstart"]
+      },
+      {
+        "group": "Concepts",
+        "pages": [
+          "concepts/privacy-model",
+          "concepts/why-parimutuel",
+          "concepts/architecture",
+          "concepts/resolution"
+        ]
+      },
+      {
+        "group": "Guides",
+        "pages": ["guides/place-a-bet", "guides/run-a-node"]
+      },
+      {
+        "group": "Reference",
+        "pages": ["reference/contracts", "reference/deployments", "reference/limits"]
+      }
+    ]
+  },
+  "footer": {
+    "socials": {
+      "github": "https://github.com/atrummarkets"
+    }
+  }
+}

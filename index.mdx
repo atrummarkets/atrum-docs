@@ -1,0 +1,55 @@
+---
+title: "Atrum"
+description: "A prediction market where nobody can see how much you bet."
+---
+
+On every prediction market today your position is public — size, timing, entry, and profit
+or loss. Anyone consistently good gets copied, and their edge is gone before they have
+realised it.
+
+Atrum hides the amount. Bets are encrypted on-chain and summed without ever being decrypted,
+so the market shows live odds while individual stakes stay private. Winnings are claimed
+through a zero-knowledge proof, so a payout cannot be traced back to the bet that earned it.
+
+<Note>
+**Everyone still sees that a bet was placed and which side it backed. Nobody sees how much,
+or whose.** That line is exact, and [Privacy model](/concepts/privacy-model) draws it
+precisely. If you are about to describe Atrum to someone, read that page first.
+</Note>
+
+## Why this cannot be retrofitted
+
+Homomorphic encryption lets a contract **add** ciphertexts. It does not let it **compare**
+them — and order matching *is* comparison. So an encrypted order book is not a hard
+engineering problem, it is a mathematical impossibility with today's cryptography.
+
+Atrum is parimutuel because that is the only mechanism that works when the contract can add
+but cannot see. See [Why parimutuel](/concepts/why-parimutuel).
+
+## What you can do
+
+<CardGroup cols={2}>
+  <Card title="Place a private bet" icon="lock" href="/guides/place-a-bet">
+    Deposit, bet, and have the amount stay hidden the whole way through.
+  </Card>
+  <Card title="Understand the privacy" icon="eye-slash" href="/concepts/privacy-model">
+    Exactly what is hidden, what is not, and what the limits are today.
+  </Card>
+  <Card title="Read the architecture" icon="sitemap" href="/concepts/architecture">
+    Encrypted accumulator, commitment tree, sequencer, publisher.
+  </Card>
+  <Card title="Live contracts" icon="cube" href="/reference/deployments">
+    Deployed addresses on Monad testnet.
+  </Card>
+</CardGroup>
+
+## Status
+
+Live on **Monad testnet**. The full private path works end to end: deposit → encrypted bet →
+settlement → private redemption → withdrawal.
+
+<Warning>
+**Not ready for real money.** The trusted setup has a single contribution, and decryption
+currently uses a single committee key held by the operator. Both are documented in
+[Limits](/reference/limits) and both must be resolved before mainnet.
+</Warning>
