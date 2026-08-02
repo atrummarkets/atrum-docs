@@ -11,6 +11,26 @@ easy to overstate in a way that a reader who opens the contracts will immediatel
 **Everyone sees that a bet was placed and which side it backed. Nobody sees how much, or
 whose.**
 
+```mermaid
+flowchart LR
+  D["Deposit<br/>address + amount"] --> T["Commitment tree"]
+  T -.->|"link broken here"| B["Bet<br/>side only"]
+  B --> S["Settle<br/>pool totals"]
+  S --> R["Redeem<br/>nothing published"]
+  R --> W["Withdraw<br/>address + amount"]
+
+  classDef pub fill:#fee2e2,stroke:#b91c1c,color:#7f1d1d
+  classDef priv fill:#dcfce7,stroke:#15803d,color:#14532d
+  class D,S,W pub
+  class B,R priv
+```
+
+<Note>
+Red is public, green is private. The dotted edge is the whole product: a bet proves it owns
+*some* note in the tree without revealing which, so the chain from your address to your
+position is cut there.
+</Note>
+
 ## Step by step
 
 <Steps>

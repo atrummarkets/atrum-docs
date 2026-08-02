@@ -17,6 +17,23 @@ you which is larger.
 
 ## Why that rules out an order book
 
+```mermaid
+flowchart TD
+  A["Contract holds encrypted stakes"] --> B{"Can it ADD<br/>two ciphertexts?"}
+  B -->|"yes"| C{"Can it COMPARE<br/>two ciphertexts?"}
+  B -->|"no"| X["No pool total.<br/>No market at all."]
+  C -->|"no — this is us"| D["No matching engine"]
+  C -->|"yes — needs FHE"| E["Order book expressible<br/><i>but comparison is the<br/>expensive operation</i>"]
+
+  D --> F["No order book"]
+  D --> G["No AMM"]
+  D --> H["Parimutuel:<br/>add stakes, divide once"]
+
+  style H stroke:#15803d,stroke-width:3px
+  style X stroke:#b91c1c,stroke-width:2px
+```
+
+
 Order matching is comparison. *Is this bid at least the ask?* Every matching engine ever
 written is built on that question.
 
@@ -33,6 +50,21 @@ it would be difficult; the market design itself has to change.
 </Note>
 
 ## Everyone hits this wall
+
+```mermaid
+flowchart LR
+  P["Penumbra"] --> PB["sealed batch auctions"]
+  R["Renegade"] --> RM["matching inside MPC"]
+  A["Atrum"] --> AP["parimutuel pooling"]
+
+  PB --> W["all avoid<br/>continuous matching"]
+  RM --> W
+  AP --> W
+
+  style A stroke:#5B21B6,stroke-width:3px
+  style W stroke:#5B21B6,stroke-width:2px
+```
+
 
 Look at what private trading systems actually do:
 

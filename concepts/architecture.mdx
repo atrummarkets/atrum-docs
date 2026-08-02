@@ -3,6 +3,40 @@ title: "Architecture"
 description: "The four moving parts and what each is trusted for."
 ---
 
+```mermaid
+flowchart TB
+  subgraph client["Your device"]
+    W["Wallet + prover<br/><i>secrets never leave</i>"]
+  end
+
+  subgraph chain["On-chain"]
+    SP["ShieldedPool<br/><i>never learns an amount</i>"]
+    ACC["ElGamalAccumulator<br/><i>ciphertext only, cannot decrypt</i>"]
+    V["Vault<br/><i>holds collateral + outcome</i>"]
+    EPP["EncryptedParimutuelPool<br/><i>settlement, proof-gated</i>"]
+    PR["PythResolver<br/><i>outcome = computation</i>"]
+  end
+
+  subgraph off["Off-chain"]
+    SEQ["Sequencer<br/><i>liveness + ordering only</i>"]
+    PUB["Publisher<br/><i>holds the committee key</i>"]
+  end
+
+  W -->|"proof + ciphertext"| SP
+  SP --> ACC
+  SP --> V
+  SEQ -->|"grafts 64 leaves"| SP
+  SEQ -->|"Merkle paths"| W
+  ACC -->|"encrypted total"| PUB
+  PUB -->|"coarse ratio only"| EPP
+  PUB -->|"totals + honesty proof"| EPP
+  PR -->|"sets outcome"| V
+  EPP -->|"settled totals"| SP
+
+  style PUB stroke:#b91c1c,stroke-width:3px
+  style ACC stroke:#5B21B6,stroke-width:2px
+```
+
 ## On-chain
 
 **ShieldedPool** — the entry point for every user action. Holds the commitment tree, the
@@ -48,6 +82,35 @@ proved.
 </Warning>
 
 ## The flow
+
+```mermaid
+sequenceDiagram
+  autonumber
+  participant U as You
+  participant P as ShieldedPool
+  participant S as Sequencer
+  participant O as Oracle
+  participant C as Committee
+
+  U->>P: deposit(amount)
+  Note right of P: amount PUBLIC<br/>must be a ladder denomination
+  S->>P: flushBatch — grafts your note
+
+  U->>S: GET /path?commitment=...
+  S-->>U: Merkle path
+  U->>P: betEncrypted(proof, ciphertext)
+  Note right of P: amount PRIVATE<br/>side public
+
+  O->>P: resolve — signed price at a committed time
+  C->>P: publishFinalTotals + honesty proof
+  Note right of P: totals become public<br/>betting is closed, so nobody can act
+
+  U->>P: redeemPrivate(proof)
+  Note right of P: pays into a NOTE<br/>no collateral moves
+  U->>P: withdraw(proof)
+  Note right of P: amount + recipient PUBLIC<br/>but unlinkable to the bet
+```
+
 
 <Steps>
   <Step title="Deposit">

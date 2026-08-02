@@ -45,6 +45,23 @@ prediction market — it is a payout to whoever checked.
 
 ## When a market cannot be answered
 
+```mermaid
+flowchart TD
+  A["Betting closes"] --> B["Resolution window opens"]
+  B --> C{"Signed price in<br/>the committed window?"}
+  C -->|"yes"| D{"price vs threshold"}
+  D -->|"above"| Y["YES"]
+  D -->|"below or equal"| N["NO"]
+  C -->|"no — feed delisted,<br/>no update landed"| E["Reverts.<br/>Permanently, by design."]
+  E --> F{"Deadline passed?"}
+  F -->|"not yet"| E
+  F -->|"yes"| V["Anyone calls voidMarket<br/>everyone refunded 1:1"]
+
+  style V stroke:#15803d,stroke-width:3px
+  style E stroke:#b91c1c,stroke-width:2px
+```
+
+
 If a feed is delisted, or no signed update ever lands in the window, resolution reverts
 permanently — by design, because that is the same property that makes it trustworthy.
 

@@ -5,6 +5,26 @@ description: "What a client does, end to end, to bet privately."
 
 Every proof is generated **in the client**. No server ever sees your secrets.
 
+```mermaid
+sequenceDiagram
+  participant U as Your browser
+  participant S as Sequencer
+  participant P as ShieldedPool
+
+  U->>U: generate nullifier + secret
+  U->>P: deposit(commitment, amount)
+  Note over U,P: amount must be on the ladder
+  S->>P: flushBatch — your note enters the tree
+
+  U->>S: GET /path?commitment=...
+  S-->>U: path elements + indices
+  Note over S: sequencer cannot prove for you<br/>and never sees your secrets
+
+  U->>U: prove bet_encrypted (~2.3s, 11.8MB artifacts)
+  U->>P: betEncrypted(proof, ciphertext)
+  Note over U,P: declare the UNIFORM gas limit,<br/>never an estimate
+```
+
 <Steps>
   <Step title="Deposit">
     Call `deposit` with a commitment and an amount **on the denomination ladder** (powers of
