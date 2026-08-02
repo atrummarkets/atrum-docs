@@ -14,22 +14,25 @@
         "group": "Getting started",
         "pages": [
           "index",
-          "quickstart"
+          "concepts/overview"
         ]
       },
       {
-        "group": "Concepts",
+        "group": "How it works",
         "pages": [
           "concepts/privacy-model",
+          "concepts/notes-and-commitments",
+          "concepts/encrypted-totals",
           "concepts/why-parimutuel",
-          "concepts/architecture",
-          "concepts/resolution"
+          "concepts/resolution",
+          "concepts/architecture"
         ]
       },
       {
-        "group": "Guides",
+        "group": "Using Atrum",
         "pages": [
-          "guides/place-a-bet"
+          "guides/place-a-bet",
+          "guides/lifecycle"
         ]
       },
       {

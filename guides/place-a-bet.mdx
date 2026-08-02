@@ -40,17 +40,16 @@ sequenceDiagram
   </Step>
 
   <Step title="Fetch a Merkle path">
-    ```
-    GET /path?commitment=0x...
-    ```
-    The sequencer returns the path elements and indices. It cannot produce a proof for you and
-    never sees your secrets.
+    Your client asks the sequencer for the sibling hashes between your leaf and the root. The
+    sequencer can produce a path but **cannot produce a proof** — it never sees your secrets,
+    and the path alone is useless without them.
   </Step>
 
   <Step title="Build the proof">
-    Feed the note, the path, and the encrypted stake into the `bet_encrypted` circuit. See
-    `circuits/build/witness-inputs.json` in the repo for a recorded example of exactly what to
-    construct.
+    Your client feeds the note, the path, and the encrypted stake into the proving circuit. The
+    proof establishes two things at once: that you own an unspent note in the tree, and that
+    the ciphertext you are publishing encrypts exactly that note's value — without revealing
+    either.
 
     <Note>
     Proving is not instant. Measured in Node: around 2.3 seconds, with roughly 11.8 MB of

@@ -13,11 +13,10 @@ description: "Live contract addresses."
 | PythResolver | `0x9f12dF52CeA11F168E523E3f050bE310051683Fd` |
 | Vault (oracle market 10) | `0xf6057FBbCE7287Fc808a2692EB1F8db81cc8Ce53` |
 
-Verify any deployment yourself:
-
-```bash
-make verify-deployment POOL=0x6af21cA16B40ae5Ab154eE1867f30FC3E64BfBED
-```
+Every deployment verifies itself before it is accepted: the exit path must be bound, the
+committee key must match the one proofs were generated against, every component must point at
+the real pool, and the removed public payout path must be absent from the deployed bytecode. A
+deployment that fails any of those is rejected rather than published.
 
 ## Dependencies
 
