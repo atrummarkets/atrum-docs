@@ -39,7 +39,6 @@
         "group": "Reference",
         "pages": [
           "reference/contracts",
-          "reference/deployments",
           "reference/performance"
         ]
       }
