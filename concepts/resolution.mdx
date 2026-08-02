@@ -29,13 +29,13 @@ Resolution is permissionless, which is only safe because the caller has no usefu
   at or after the target time.
 - **Not the outcome** — it is a comparison.
 
-<Warning>
-The last point is subtle and got fixed during development. Pyth publishes roughly every 400ms,
-so a 60-second window contains around 150 candidate updates. If any update in the window were
-acceptable, a bettor could fetch them all and submit whichever one wins them the market.
-Atrum uses the variant that pins the result to the **first** update at or after the target and
-proves no earlier one exists.
-</Warning>
+<Note>
+The third point is subtle and worth spelling out. Pyth publishes roughly every 400ms, so a
+60-second window holds around 150 candidate prices. If any of them were acceptable, whoever
+called `resolve` could pick the one that suited them. Atrum instead pins the result to the
+**first** update at or after the target time, with proof that no earlier one exists — so there
+is nothing to choose.
+</Note>
 
 ## Why the price must come from after betting closed
 

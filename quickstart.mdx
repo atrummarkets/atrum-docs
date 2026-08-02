@@ -21,11 +21,11 @@ make verifiers   # copy generated verifiers into contracts/
 make test
 ```
 
-<Warning>
+<Note>
 Always run `make fixtures`, never the individual generators. They are coupled: the settlement
 fixtures prove a statement about the ciphertext the action fixtures produce, so regenerating
 one alone leaves a proof bound to a ciphertext that no longer exists.
-</Warning>
+</Note>
 
 ## Deploy to testnet
 

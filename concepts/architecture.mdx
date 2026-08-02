@@ -74,12 +74,11 @@ cannot choose padding (fillers are derived on-chain). What it can do is stall.
 can turn the accumulated ciphertext into a number. It decrypts the total, computes a coarse
 ratio, and publishes only that.
 
-<Warning>
-The published ratio is **unverified by construction** — checking it against the ciphertexts
-would require the plaintexts, which defeats the purpose. That is survivable only because **no
-payout reads it.** Settlement goes through a proof. The odds are decoration; the money is
-proved.
-</Warning>
+<Note>
+Mid-market odds are indicative. Verifying them on-chain would require the plaintext totals,
+which is exactly what the encryption exists to prevent — so **no payout ever reads them.**
+Settlement goes through a cryptographic proof instead. The odds inform; the money is proved.
+</Note>
 
 ## The flow
 
@@ -143,4 +142,4 @@ A snug per-action limit would reveal which private action you took even though t
 sealed.
 
 So every user action is submitted with one identical declared limit. Privacy has a measurable
-price, and this is where it is paid. See [Limits](/reference/limits).
+price, and this is where it is paid. See [Performance](/reference/performance).

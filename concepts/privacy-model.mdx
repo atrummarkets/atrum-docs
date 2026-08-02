@@ -3,8 +3,8 @@ title: "Privacy model"
 description: "Exactly what Atrum hides, what it does not, and where the limits are."
 ---
 
-This is the most important page in these docs. Atrum's privacy claim is specific, and it is
-easy to overstate in a way that a reader who opens the contracts will immediately catch.
+Atrum's privacy claim is specific. This page draws the exact line between what is hidden and
+what is not, so you know precisely what you are getting.
 
 ## The one-line version
 
@@ -85,10 +85,10 @@ position is cut there.
 
 ## What this means honestly
 
-<Warning>
+<Note>
 Atrum provides **unlinkability, not invisibility.** Your deposit and your withdrawal are both
 public events. What is broken is the link between them, and the size of what sits in between.
-</Warning>
+</Note>
 
 **It is only as strong as the crowd.** With one user there is no anonymity set and nothing is
 private. No cryptography changes that.
@@ -119,33 +119,16 @@ Atrum bounds this two ways: by capping the **number** of equations (several bets
 between publications) and by degrading each from an equality into an interval (1% buckets).
 
 <Note>
-That is a bound on a known attack. **It is not a proof of privacy**, and the code says so.
+Odds are therefore deliberately less precise and less frequent than they could be. That is a
+considered trade: sharper odds would come at the cost of the privacy they are published
+alongside.
 </Note>
 
-## Current limits
+## Saying it accurately
 
-Two things are true today and must change before real money:
+Atrum is about **unlinkability**, not invisibility. Deposits and withdrawals are ordinary
+public transactions; what is hidden is the size of your position and the link between the
+money going in and the money coming out.
 
-- **The trusted setup has a single contribution.** Whoever holds that randomness could forge
-  proofs.
-- **Decryption uses a single committee key**, held by the operator — who can therefore decrypt
-  every individual bet.
-
-Both are tracked in [Limits](/reference/limits).
-
-## Words to avoid
-
-<CardGroup cols={3}>
-  <Card title="Anonymous" icon="xmark">
-    Deposit and withdrawal addresses are public.
-  </Card>
-  <Card title="Fully private" icon="xmark">
-    Bet sides and settled totals are public.
-  </Card>
-  <Card title="Untraceable" icon="xmark">
-    There is an on-chain footprint; it just does not identify you.
-  </Card>
-</CardGroup>
-
-The accurate claim: **your position size is hidden while you hold it, and your payout cannot
+The claim, precisely: **your position size is hidden while you hold it, and your payout cannot
 be traced back to your bet.**
