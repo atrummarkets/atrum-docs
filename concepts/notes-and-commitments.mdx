@@ -16,7 +16,7 @@ A note is five numbers you keep on your own device:
 |---|---|
 | `nullifier` | a secret, used once to spend the note |
 | `secret` | a second secret, so the commitment cannot be guessed |
-| `marketId` | which market it belongs to |
+| `marketId` | which market it belongs to — `0` until the note is bet; a deposit never names one |
 | `outcome` | unbet collateral, a YES position, a NO position, or a settled payout |
 | `units` | how much it is worth |
 
@@ -104,10 +104,18 @@ An action consumes a note and produces a new one. The `outcome` field controls w
 
 | state | can be bet | can be redeemed | can be withdrawn |
 |---|---|---|---|
-| **unbet collateral** | yes | yes, as a 1:1 refund | no |
+| **unbet collateral** | yes | yes, as a 1:1 refund | **yes — directly, without betting** |
 | **YES position** | no | if YES won | no |
 | **NO position** | no | if NO won | no |
 | **settled payout** | no | **no** | yes |
+
+**Unbet collateral has its own direct exit.** Withdraw a note that was never bet and it comes
+straight back to you — no redeem step, no market involved. The proof itself decides which of
+the two withdrawal paths is legal: it derives a 1-bit `unbetExit` flag from whether the spent
+note's `marketId` is zero, and publishes only that bit, never which market. That flag replaced
+what used to be the full `marketId` in a withdrawal's public signal — which, for a winner
+cashing out a settled payout, publicly named the market they'd won. Narrowing it to one bit
+closed that leak.
 
 The fourth state exists for a specific reason. A payout has to be tagged as *something*, and
 every other value is a trap: tag it as unbet collateral and it could be redeemed again as a

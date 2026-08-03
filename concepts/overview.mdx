@@ -49,14 +49,16 @@ public and must be a standard denomination, so it does not single you out.
 
 **Bet.** Prove you own *some* unspent note without revealing which, and publish an encrypted
 stake. The contract adds the ciphertext to a running total it cannot read. This is where the
-link from your address to your position is cut.
+link from your address to your position is cut — and a relayer, not your wallet, typically
+submits the transaction, so your address doesn't even appear as its sender.
 
 **Redeem.** Once the market settles, prove your position won and receive a new note holding the
 payout. **No money moves.** Nothing about you is published. This is where the link from your
-position to your money is cut.
+position to your money is cut. Relayed as well.
 
 **Withdraw.** Turn a settled note into collateral in your wallet, at a time you choose, in a
-standard amount. Public — but unconnected to anything above.
+standard amount. Public — but unconnected to anything above. The transaction is relayed too:
+public because collateral has to land somewhere, not because you signed it.
 
 ## Why two separate exits
 

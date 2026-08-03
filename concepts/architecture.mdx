@@ -12,7 +12,7 @@ flowchart TB
   subgraph chain["On-chain"]
     SP["ShieldedPool<br/><i>never learns an amount</i>"]
     ACC["ElGamalAccumulator<br/><i>ciphertext only, cannot decrypt</i>"]
-    V["Vault<br/><i>holds collateral + outcome</i>"]
+    V["Vault<br/><i>outcome + immutable clock only</i>"]
     EPP["EncryptedParimutuelPool<br/><i>settlement, proof-gated</i>"]
     PR["PythResolver<br/><i>outcome = computation</i>"]
   end
@@ -40,14 +40,19 @@ flowchart TB
 ## On-chain
 
 **ShieldedPool** — the entry point for every user action. Holds the commitment tree, the
-nullifier set, and the proof verifiers. Never learns an amount.
+nullifier set, and the proof verifiers. Never learns an amount. It also custodies all
+collateral directly, in one shared pool across every market — a deposit does not name a market,
+so there is nothing to hold per-market. Solvency is a running global check (collateral paid out
+can never exceed collateral deposited), not a per-market invariant.
 
 **ElGamalAccumulator** — holds the running encrypted total per market, per side. It stores
 ciphertext points and has no ability to decrypt anything. Adding a stake is point addition on
 BabyJubJub.
 
-**Vault** — custodies collateral and holds the outcome. Splits deposits into YES/NO positions
-and pays out against the winning side.
+**Vault** — holds the outcome and the market's immutable clock (`bettingCloseTime`,
+`resolutionStartTime`). It does not custody collateral for the shielded flow — see
+ShieldedPool, above. `Vault.split`/`merge`/`redeem` still exist as plain, non-ZK functions, but
+the shielded flow never calls them.
 
 **EncryptedParimutuelPool** — settlement. Accepts the decrypted final totals along with a
 Chaum-Pedersen proof that the decryption is honest with respect to the published committee
@@ -69,6 +74,21 @@ the gas budget, not an optimisation.
 The sequencer is trusted for **liveness and ordering only**. It cannot steal, cannot insert a
 leaf nobody queued (the contract checks every submitted leaf against the on-chain queue), and
 cannot choose padding (fillers are derived on-chain). What it can do is stall.
+
+**Relaying.** The sequencer can also submit `betEncrypted`, `redeemPrivate`, and `withdraw` on
+your behalf — proof-gated, not sender-gated, so nothing about their validity depends on
+trusting it. `deposit` is never relayed this way: it moves real collateral via
+`transferFrom(msg.sender)`, so it always needs your own wallet regardless of relaying. For the
+other three, relaying means your wallet address never appears on that specific transaction —
+the sequencer knows it was you, but the chain does not.
+
+<Note>
+That is trust relocated, not removed. Relaying adds a liveness dependency, the same way
+batching does, and it is optional — configured per deployment, off unless the operator funds
+it. Optionally, right after a relayed withdrawal lands, the same relayer can send the recipient
+a small amount of native gas in a follow-up transaction, so a freshly-used address has enough
+to transact again.
+</Note>
 
 **Publisher** — the only process holding the committee key, and therefore the only thing that
 can turn the accumulated ciphertext into a number. It decrypts the total, computes a coarse
@@ -92,29 +112,32 @@ sequenceDiagram
   participant C as Committee
 
   U->>P: deposit(amount)
-  Note right of P: amount PUBLIC<br/>must be a ladder denomination
+  Note right of P: amount PUBLIC, must be a ladder denomination<br/>always your own wallet — transferFrom needs it
   S->>P: flushBatch — grafts your note
 
   U->>S: GET /path?commitment=...
   S-->>U: Merkle path
-  U->>P: betEncrypted(proof, ciphertext)
-  Note right of P: amount PRIVATE<br/>side public
+  U->>S: betEncrypted(proof, ciphertext)
+  S->>P: betEncrypted (relayed)
+  Note right of P: amount PRIVATE, side public<br/>your wallet never signs this tx
 
   O->>P: resolve — signed price at a committed time
   C->>P: publishFinalTotals + honesty proof
   Note right of P: totals become public<br/>betting is closed, so nobody can act
 
-  U->>P: redeemPrivate(proof)
+  U->>S: redeemPrivate(proof)
+  S->>P: redeemPrivate (relayed)
   Note right of P: pays into a NOTE<br/>no collateral moves
-  U->>P: withdraw(proof)
+  U->>S: withdraw(proof)
+  S->>P: withdraw (relayed)
   Note right of P: amount + recipient PUBLIC<br/>but unlinkable to the bet
 ```
 
 
 <Steps>
   <Step title="Deposit">
-    Collateral enters the Vault, a commitment is queued, and the sequencer grafts it into the
-    tree.
+    Collateral enters ShieldedPool's shared pool, a commitment is queued, and the sequencer
+    grafts it into the tree.
   </Step>
   <Step title="Bet">
     A proof shows you own an unspent note without revealing which. The encrypted stake is

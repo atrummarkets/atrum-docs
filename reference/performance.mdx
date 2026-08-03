@@ -14,7 +14,7 @@ you took.
 | action | gas | % of the 2,500,000 envelope |
 |---|---|---|
 | `betEncrypted` | ~1,947,000 | 78% |
-| `deposit` | 1,815,993 | 73% |
+| `deposit` | 1,135,409 | 45% |
 | `withdraw` | 1,804,341 | 72% |
 | `redeemPrivate` | 1,671,108 | 67% |
 
@@ -22,6 +22,11 @@ you took.
 Local `forge` figures understate real cost by **32–55%** — they charge neither calldata, the
 intrinsic transaction cost, nor true cross-contract cold access. Every number above is measured
 on chain.
+</Note>
+
+<Note>
+`deposit` got cheaper: it used to split collateral into a per-market Vault at deposit time
+(1,815,993 gas), and no longer does — a deposit names no market, so there is nothing to split.
 </Note>
 
 The envelope is set once. Changing it is publicly observable and would shrink the anonymity set

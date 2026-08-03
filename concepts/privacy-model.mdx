@@ -50,6 +50,9 @@ position is cut there.
     observer knows a deposit is being bet, but not whose. The stake itself is encrypted and
     the contract adds it to a running total it can never read.
 
+    The transaction itself is typically relayed, too: a sequencer submits it on your behalf, so
+    an observer doesn't even see your address as the sender.
+
     **Public:** that a bet happened, and its side. **Private:** the amount, and which deposit
     funded it.
   </Step>
@@ -79,7 +82,9 @@ position is cut there.
 
     What stays hidden is *which* note funded it, *which* bet earned it, and *when* relative to
     your position — you withdraw at a time of your choosing, in a fixed denomination, with the
-    remainder kept as a private change note.
+    remainder kept as a private change note. Like the bet, this transaction is usually relayed
+    too, so the recipient address is public because it is a genuine payment destination — not
+    because it is also whoever signed the transaction.
   </Step>
 </Steps>
 

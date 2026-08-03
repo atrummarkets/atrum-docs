@@ -9,10 +9,10 @@ Every user action. Holds the commitment tree, nullifier set, and verifiers.
 
 | function | what it does |
 |---|---|
-| `deposit` | Locks collateral, queues a note. Amount **public**, must be on the denomination ladder. |
+| `deposit` | Locks collateral into ShieldedPool's own shared pool, queues a note. Amount **public**, must be on the denomination ladder. Names no market. |
 | `betEncrypted` | Spends a note, publishes a ciphertext. Amount **private**; side public. |
 | `redeemPrivate` | Turns a winning position into a settled note. **Moves no collateral.** |
-| `withdraw` | Spends a settled note for public collateral, keeping change private. |
+| `withdraw` | Spends a settled note, or an unbet note directly, for public collateral, keeping change private. |
 | `flushBatch` | Sequencer-only. Grafts 64 leaves, padding with on-chain-derived fillers. |
 
 <Note>
@@ -21,15 +21,27 @@ would retroactively reveal every position. It was removed, and the deployment in
 assert its selector is absent from deployed bytecode.
 </Note>
 
+<Note>
+`withdrawData` used to pack a full `marketId`, which let a winner's withdrawal publicly name
+the market they won. It now packs a single `unbetExit` bit — never-bet exit vs. settled payout
+— and nothing else about the note.
+</Note>
+
 ## Vault
 
-Custodies collateral and holds the outcome. `Unresolved`, `Yes`, `No`, or `Void`.
+Holds the outcome (`Unresolved`, `Yes`, `No`, or `Void`) and the market's immutable clock —
+`bettingCloseTime` and `resolutionStartTime`, fixed at creation, so nobody can move a deadline
+after seeing how a market is going. `voidMarket` is permissionless after a deadline and sets
+the outcome to `Void`, which is what lets everyone redeem their stake 1:1 regardless of side.
 
-`split` mints paired YES/NO positions against collateral; `merge` reverses it; `redeem` pays
-the winning side. `voidMarket` is permissionless after a deadline and refunds everyone 1:1.
+It does not custody collateral for the shielded flow: `ShieldedPool` holds all collateral
+itself, in one shared pool across every market, checked against a running global bound (total
+withdrawn can never exceed total deposited) rather than a per-market invariant.
 
-`bettingCloseTime` and `resolutionStartTime` are **immutable**. No one can move a deadline
-after seeing how a market is going.
+<Note>
+`Vault.split`/`merge`/`redeem` still exist as plain, non-ZK functions and remain technically
+callable directly — but the shielded flow never calls them.
+</Note>
 
 ## ElGamalAccumulator
 

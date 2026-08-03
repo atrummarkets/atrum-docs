@@ -5,6 +5,11 @@ description: "What a client does, end to end, to bet privately."
 
 Every proof is generated **in the client**. No server ever sees your secrets.
 
+The transactions that carry them are often relayed, too: `betEncrypted`, `redeemPrivate`, and
+`withdraw` can be submitted by the sequencer on your behalf, so your wallet never signs them.
+Only `deposit` always needs your own wallet — it pulls real collateral via
+`transferFrom(msg.sender)`, so relaying it would not remove anything.
+
 ```mermaid
 sequenceDiagram
   participant U as Your browser
@@ -21,8 +26,9 @@ sequenceDiagram
   Note over S: sequencer cannot prove for you<br/>and never sees your secrets
 
   U->>U: prove bet_encrypted (~2.3s, 11.8MB artifacts)
-  U->>P: betEncrypted(proof, ciphertext)
-  Note over U,P: declare the UNIFORM gas limit,<br/>never an estimate
+  U->>S: betEncrypted(proof, ciphertext)
+  S->>P: betEncrypted (relayed)
+  Note over S,P: declare the UNIFORM gas limit, never an estimate<br/>your wallet never signs this tx
 ```
 
 <Steps>
@@ -37,6 +43,11 @@ sequenceDiagram
   <Step title="Wait for the graft">
     Your commitment sits in a queue until the sequencer inserts it. You cannot bet from a note
     that is not yet in the tree, because there is no Merkle path to prove membership with.
+
+    <Note>
+    Changed your mind before betting? A deposit that's still unbet can be withdrawn straight
+    back out at any time — no market, no redeem step, just a direct exit.
+    </Note>
   </Step>
 
   <Step title="Fetch a Merkle path">
@@ -59,8 +70,12 @@ sequenceDiagram
   </Step>
 
   <Step title="Submit">
-    Call `betEncrypted` with the proof, the public signals, and the ciphertext — declaring the
-    **uniform gas limit**, never an estimate. An estimate leaks which action you took.
+    Hand the proof, the public signals, and the ciphertext to the sequencer, which relays
+    `betEncrypted` for you, declaring the **uniform gas limit**, never an estimate — an estimate
+    leaks which action you took. Relaying is proof-gated: the sequencer cannot forge or alter
+    what you proved, only submit it, so correctness never depends on trusting it — only
+    liveness does. Your client can also submit the transaction itself if you'd rather not use a
+    relayer; either way, the proof is what the contract checks.
   </Step>
 </Steps>
 
@@ -69,10 +84,19 @@ sequenceDiagram
 <Steps>
   <Step title="Redeem privately">
     Prove your position won and receive a **settled note**. No collateral moves and no amount
-    is published — this is the step that breaks the link between position and payout.
+    is published — this is the step that breaks the link between position and payout. Relayed,
+    same as the bet.
   </Step>
   <Step title="Withdraw">
     Spend the settled note for public collateral, in a ladder amount, keeping the remainder as
-    a private change note. Withdraw whenever you like; timing is part of your privacy.
+    a private change note. Withdraw whenever you like; timing is part of your privacy. Relayed
+    too — the recipient address is public because collateral has to land somewhere, not because
+    you signed the transaction.
+
+    <Note>
+    Some deployments also top up the recipient with a little native gas right after, in a
+    follow-up transaction, so a freshly-used address has enough to transact again. Optional,
+    operator-configured.
+    </Note>
   </Step>
 </Steps>
