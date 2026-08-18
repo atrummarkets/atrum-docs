@@ -29,6 +29,12 @@
         ]
       },
       {
+        "group": "What's next",
+        "pages": [
+          "concepts/v2-sealed-orders"
+        ]
+      },
+      {
         "group": "Using Atrum",
         "pages": [
           "guides/place-a-bet",

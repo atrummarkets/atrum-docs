@@ -1,10 +1,20 @@
 ---
 title: "Why parimutuel"
-description: "The constraint that decides Atrum's market design, and why an encrypted order book is impossible."
+description: "The constraint that shaped V1's market design — and the step in the argument that turned out not to hold."
 ---
 
-Atrum is a parimutuel pool, not an order book. That is not a preference or a simplification —
-it is the only mechanism that works under the constraint.
+<Warning>
+**This page's conclusion has been superseded.** The constraint below is real and still worth
+understanding — a contract that can add ciphertexts genuinely cannot compare them. What does
+not follow is *therefore no order book*, because matching never had to happen inside the
+contract. See [V2: sealed orders](/concepts/v2-sealed-orders).
+
+The page is kept rather than deleted: it describes V1, which is what runs today, and the
+reasoning error is more useful visible than quietly removed.
+</Warning>
+
+Atrum V1 is a parimutuel pool, not an order book. Under the assumption that matching must
+happen on-chain, it is the only mechanism that works.
 
 ## The constraint
 
@@ -97,3 +107,17 @@ batch auction**, not continuous matching — which is, again, a form of batching
 
 FHE also does not remove the need for a decryption committee. It relocates the trust; it does
 not delete it.
+
+## Where this argument actually lands
+
+Two things above point at the answer, and the page did not follow them.
+
+Penumbra is listed as batching trades into sealed auctions. The FHE section concludes that
+the realistic first version is *"a periodic batch auction, not continuous matching."* Both are
+correct, and together they describe a mechanism that needs no on-chain comparison at all — a
+sealed batch auction clearing at a uniform price, where the clearing price is computed off
+the chain and verified on it.
+
+The wall this page describes is real. It sits between the contract and continuous matching,
+not between Atrum and a market. [V2: sealed orders](/concepts/v2-sealed-orders) is what is on
+the other side of it.
